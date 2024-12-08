@@ -1,6 +1,4 @@
-
 services:
-
   discovery-service:
     container_name: discovery-service
     build: ./Discovery-service
@@ -9,10 +7,9 @@ services:
     expose:
       - '8761'
     healthcheck:
-      test: ["CMD", "curl", "http://localhost:8761/actuator/health"]
+      test: ["CMD", "curl", "http://192.168.189.159:8761/actuator/health"]
       interval: 10s
       retries: 4
-
 
   config-service:
     container_name: config-service
@@ -22,33 +19,14 @@ services:
     expose:
       - '9999'
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:9999/actuator/health" ]
+      test: ["CMD", "curl", "http://192.168.189.159:9999/actuator/health"]
       interval: 10s
       retries: 4
     environment:
-      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - DISCOVERY_SERVICE_URL=http://192.168.189.159:8761/eureka
     depends_on:
       discovery-service:
         condition: service_healthy
-
-
-#  enseignant-service:
-#    build: ./Enseignant-Service
-#    container_name: enseignant-service
-#    ports:
-#      - '8081:8081'
-#    expose:
-#      - '8081'
-#    healthcheck:
-#      test: [ "CMD", "curl", "http://localhost:8081/actuator/health" ]
-#      interval: 10s
-#      retries: 4
-#    environment:
-#      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
-#      - CONFIG_SERVICE=http://config-service:9999
-#    depends_on:
-#      config-service:
-#        condition: service_healthy
 
   chercheur-service:
     build: ./Chercheur-Service
@@ -58,34 +36,15 @@ services:
     expose:
       - '8082'
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:8082/actuator/health" ]
+      test: ["CMD", "curl", "http://192.168.189.159:8082/actuator/health"]
       interval: 10s
       retries: 4
     environment:
-      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
-      - CONFIG_SERVICE=http://config-service:9999
-#    depends_on:
-#      enseignant-service:
-#        condition: service_healthy
-
-#  projet-service:
-#    build: ./Projet-Service
-#    container_name: projet-service
-#    ports:
-#      - '8083:8083'
-#    expose:
-#      - '8083'
-#    healthcheck:
-#      test: [ "CMD", "curl", "http://localhost:8083/actuator/health" ]
-#      interval: 10s
-#      retries: 4
-#    environment:
-#      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
-#      - CONFIG_SERVICE=http://config-service:9999
-#    depends_on:
-#      chercheur-service:
-#        condition: service_healthy
-#
+      - DISCOVERY_SERVICE_URL=http://192.168.189.159:8761/eureka
+      - CONFIG_SERVICE=http://192.168.189.159:9999
+    depends_on:
+      config-service:
+        condition: service_healthy
 
   gateway_service:
     build: ./Gateway_Service
@@ -95,37 +54,15 @@ services:
     expose:
       - '8888'
     environment:
-      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
-      - CONFIG_SERVICE=http://config-service:9999
+      - DISCOVERY_SERVICE_URL=http://192.168.189.159:8761/eureka
+      - CONFIG_SERVICE=http://192.168.189.159:9999
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:8888/actuator/health" ]
+      test: ["CMD", "curl", "http://192.168.189.159:8888/actuator/health"]
       interval: 10s
       retries: 4
     networks:
       default:
-        ipv4_address: 192.168.100.20
+        ipv4_address: 192.168.189.159
     depends_on:
       config-service:
         condition: service_healthy
-
-#  security-service:
-#    build: ./Security_Microservice
-#    container_name: security-service
-#    ports:
-#      - '8080:8080'
-#    expose:
-#      - '8080'
-#    environment:
-#      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
-#      - GATEWAY_SERVICE_URL=http://192.168.100.20:8888
-#    depends_on:
-#      gateway_service:
-#        condition: service_healthy
-#
-#
-#networks:
-#  default:
-#    driver: bridge
-#    ipam:
-#      config:
-#        - subnet: 192.168.100.0/24
